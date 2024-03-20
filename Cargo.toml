@@ -1,0 +1,17 @@
+[package]
+name = "one-billion-row-challange"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num_cpus = "1.16.0"
+tokio = { version = "1", features = ["full"] }
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "1brc"
+harness = false

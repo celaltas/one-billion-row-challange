@@ -1,0 +1,312 @@
+Hamburg;12.0
+Bulawayo;8.9
+Palembang;38.8
+St. John's;15.2
+Cracow;12.6
+Bridgetown;26.9
+Istanbul;6.2
+Roseau;34.4
+Conakry;31.2
+Istanbul;23.0
+Hamburg;15.0
+Bulawayo;10.9
+Palembang;36.8
+St. John's;18.2
+Cracow;15.6
+Bridgetown;29.9
+Istanbul;9.2
+Roseau;37.4
+Conakry;34.2
+Istanbul;26.0
+Hamburg;18.0
+Bulawayo;13.9
+Palembang;39.8
+St. John's;21.2
+Cracow;18.6
+Bridgetown;32.9
+Istanbul;12.2
+Roseau;39.4
+Conakry;37.2
+Istanbul;29.0
+Hamburg;21.0
+Bulawayo;16.9
+Palembang;41.8
+St. John's;24.2
+Cracow;21.6
+Bridgetown;35.9
+Istanbul;15.2
+Roseau;42.4
+Conakry;40.2
+Istanbul;32.0
+Hamburg;24.0
+Bulawayo;19.9
+Palembang;43.8
+St. John's;27.2
+Cracow;24.6
+Bridgetown;38.9
+Istanbul;18.2
+Roseau;45.4
+Conakry;42.2
+Istanbul;35.0
+Hamburg;27.0
+Bulawayo;22.9
+Palembang;45.8
+St. John's;30.2
+Cracow;27.6
+Bridgetown;41.9
+Istanbul;21.2
+Roseau;48.4
+Conakry;45.2
+Istanbul;38.0
+Hamburg;30.0
+Bulawayo;25.9
+Palembang;47.8
+St. John's;33.2
+Cracow;30.6
+Bridgetown;44.9
+Istanbul;24.2
+Roseau;51.4
+Conakry;48.2
+Istanbul;41.0
+Hamburg;33.0
+Bulawayo;28.9
+Palembang;49.8
+St. John's;36.2
+Cracow;33.6
+Bridgetown;47.9
+Istanbul;27.2
+Roseau;54.4
+Conakry;51.2
+Istanbul;44.0
+Hamburg;36.0
+Bulawayo;31.9
+Palembang;51.8
+St. John's;39.2
+Cracow;36.6
+Bridgetown;50.9
+Istanbul;29.2
+Roseau;57.4
+Conakry;54.2
+Istanbul;47.0
+Hamburg;39.0
+Bulawayo;34.9
+Palembang;53.8
+St. John's;42.2
+Cracow;39.6
+Bridgetown;53.9
+Istanbul;31.2
+Roseau;59.4
+Conakry;56.2
+Istanbul;50.0
+Hamburg;42.0
+Bulawayo;37.9
+Palembang;55.8
+St. John's;45.2
+Cracow;42.6
+Bridgetown;56.9
+Istanbul;33.2
+Roseau;61.4
+Conakry;58.2
+Istanbul;55.0
+Hamburg;45.0
+Bulawayo;40.9
+Palembang;57.8
+St. John's;48.2
+Cracow;45.6
+Bridgetown;59.9
+Istanbul;35.2
+Roseau;63.4
+Conakry;60.2
+Istanbul;59.0
+Hamburg;48.0
+Bulawayo;43.9
+Palembang;59.8
+St. John's;51.2
+Cracow;48.6
+Bridgetown;62.9
+Istanbul;37.2
+Roseau;65.4
+Conakry;62.2
+Istanbul;63.0
+Hamburg;51.0
+Bulawayo;46.9
+Palembang;61.8
+St. John's;54.2
+Cracow;51.6
+Bridgetown;65.9
+Istanbul;39.2
+Roseau;67.4
+Conakry;64.2
+Istanbul;67.0
+Hamburg;54.0
+Bulawayo;49.9
+Palembang;63.8
+St. John's;57.2
+Cracow;54.6
+Bridgetown;68.9
+Istanbul;41.2
+Roseau;70.4
+Conakry;66.2
+Istanbul;71.0
+Hamburg;57.0
+Bulawayo;52.9
+Palembang;65.8
+St. John's;60.2
+Cracow;57.6
+Bridgetown;71.9
+Istanbul;43.2
+Roseau;73.4
+Conakry;69.2
+Istanbul;75.0
+Hamburg;59.0
+Bulawayo;54.9
+Palembang;67.8
+St. John's;63.2
+Cracow;60.6
+Bridgetown;74.9
+Istanbul;45.2
+Roseau;76.4
+Conakry;72.2
+Istanbul;79.0
+Hamburg;61.0
+Bulawayo;56.9
+Palembang;69.8
+St. John's;66.2
+Cracow;63.6
+Bridgetown;77.9
+Istanbul;47.2
+Roseau;79.4
+Conakry;75.2
+Istanbul;83.0
+Hamburg;63.0
+Bulawayo;58.9
+Palembang;71.8
+St. John's;69.2
+Cracow;66.6
+Bridgetown;80.9
+Istanbul;49.2
+Roseau;82.4
+Conakry;78.2
+Istanbul;87.0
+Hamburg;65.0
+Bulawayo;60.9
+Palembang;73.8
+St. John's;72.2
+Cracow;69.6
+Bridgetown;83.9
+Istanbul;51.2
+Roseau;85.4
+Conakry;80.2
+Istanbul;91.0
+Hamburg;67.0
+Bulawayo;62.9
+Palembang;75.8
+St. John's;75.2
+Cracow;72.6
+Bridgetown;86.9
+Istanbul;53.2
+Roseau;88.4
+Conakry;83.2
+Istanbul;95.0
+Hamburg;69.0
+Bulawayo;64.9
+Palembang;77.8
+St. John's;78.2
+Cracow;75.6
+Bridgetown;89.9
+Istanbul;55.2
+Roseau;91.4
+Conakry;86.2
+Istanbul;99.0
+Hamburg;71.0
+Bulawayo;66.9
+Palembang;80.8
+St. John's;81.2
+Cracow;78.6
+Bridgetown;92.9
+Istanbul;57.2
+Roseau;94.4
+Conakry;89.2
+Istanbul;103.0
+Hamburg;73.0
+Bulawayo;68.9
+Palembang;83.8
+St. John's;84.2
+Cracow;81.6
+Bridgetown;95.9
+Istanbul;59.2
+Roseau;97.4
+Conakry;92.2
+Istanbul;107.0
+Hamburg;75.0
+Bulawayo;70.9
+Palembang;86.8
+St. John's;87.2
+Cracow;84.6
+Bridgetown;98.9
+Istanbul;61.2
+Roseau;100.4
+Conakry;95.2
+Istanbul;111.0
+Hamburg;77.0
+Bulawayo;72.9
+Palembang;89.8
+St. John's;90.2
+Cracow;87.6
+Bridgetown;101.9
+Istanbul;63.2
+Roseau;103.4
+Conakry;98.2
+Istanbul;115.0
+Hamburg;79.0
+Bulawayo;74.9
+Palembang;92.8
+St. John's;93.2
+Cracow;90.6
+Bridgetown;104.9
+Istanbul;65.2
+Roseau;106.4
+Conakry;101.2
+Istanbul;119.0
+Hamburg;81.0
+Bulawayo;76.9
+Palembang;95.8
+St. John's;96.2
+Cracow;93.6
+Bridgetown;107.9
+Istanbul;67.2
+Roseau;109.4
+Conakry;104.2
+Istanbul;123.0
+Hamburg;83.0
+Bulawayo;78.9
+Palembang;98.8
+St. John's;99.2
+Cracow;96.6
+Bridgetown;110.9
+Istanbul;69.2
+Roseau;112.4
+Conakry;107.2
+Istanbul;127.0
+Hamburg;85.0
+Bulawayo;80.9
+Palembang;101.8
+St. John's;102.2
+Cracow;99.6
+Bridgetown;113.9
+Istanbul;71.2
+Roseau;115.4
+Conakry;110.2
+Istanbul;131.0
+Hamburg;87.0
+Bulawayo;82.9
+Palembang;104.8
+St. John's;105.2
+Cracow;102.6
+Bridgetown;116.9
+Istanbul;73.2
+Roseau;118.4
+Conakry;113.2
+Istanbul;135.0
+Hamburg;89.0
+Bulawayo;84.9
