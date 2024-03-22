@@ -39,9 +39,9 @@ pub struct Message {
 }
 
 impl<'a> City<'a> {
-    pub fn new(name: &'a str, values: &'a Vec<f32>) -> City<'a> {
+    pub fn new(name: &'a str, values: &'a [f32]) -> City<'a> {
         let mut mean = values.iter().sum();
-        mean = mean / values.len() as f32;
+        mean /= values.len() as f32;
 
         City {
             name,
@@ -57,45 +57,27 @@ impl<'a> City<'a> {
 }
 
 pub async fn run() -> io::Result<()> {
-    let filename = "test.txt";
-    let num_threads = num_cpus::get();
+    let filename = "measurements.txt";
     let reader = BufReader::new(File::open(filename)?);
-    let lines: Vec<_> = reader.lines().map(|line| line.unwrap()).collect();
-    let total_lines = lines.len();
-    let lines_per_thread = total_lines / num_threads;
-
+    let chunk_size = 10000;
+    let chunks = Arc::new(Mutex::new(Vec::with_capacity(chunk_size)));
     let cities = Arc::new(Mutex::new(BTreeMap::<String, Stats>::new()));
+    let mut total = 0;
 
-    let handles: Vec<_> = (0..num_threads)
-        .map(|i| {
-            let start_line = i * lines_per_thread;
-            let end_line = if i == num_threads - 1 {
-                total_lines
-            } else {
-                (i + 1) * lines_per_thread
-            };
+    for line in reader.lines() {
+        let line = line.unwrap();
+        chunks.lock().unwrap().push(line);
 
+        if chunks.lock().unwrap().len() == chunk_size {
             let cities = Arc::clone(&cities);
-            let chunk_lines: Vec<String> = lines[start_line..end_line].iter().cloned().collect();
-            
-
-            tokio::spawn(async move {
-                for line in chunk_lines {
-                    let (city, temp) = extract_city_temp_with_parser(&line);
-                    println!("city = {city}, tempreature = {temp} added.");
-                    let mut guard = cities.lock().unwrap();
-                    let city_stats = guard.entry(city).or_default();
-                    city_stats.min = temp.min(city_stats.min);
-                    city_stats.max = temp.max(city_stats.max);
-                    city_stats.sum += temp;
-                    city_stats.count += 1.0;
-                }
-            })
-        })
-        .collect();
-
-    for handle in handles {
-        handle.await?;
+            let chunks_clone = Arc::clone(&chunks);
+            let handle = tokio::spawn(async move {
+                process_chunk(chunks_clone, cities).await;
+            });
+            handle.await?;
+            total += chunk_size;
+            println!("total = {total}");
+        }
     }
 
     let cities_guard = cities.lock().unwrap();
@@ -105,6 +87,31 @@ pub async fn run() -> io::Result<()> {
     }
 
     Ok(())
+}
+
+async fn process_chunk(
+    chunks: Arc<Mutex<Vec<String>>>,
+    cities: Arc<Mutex<BTreeMap<String, Stats>>>,
+) {
+    let mut stats = BTreeMap::<String, Stats>::new();
+    let mut chunks = chunks.lock().unwrap();
+    for line in chunks.iter() {
+        let (city, temp) = extract_city_temp(&line);
+        let city_stats = stats.entry(city).or_default();
+        city_stats.min = temp.min(city_stats.min);
+        city_stats.max = temp.max(city_stats.max);
+        city_stats.sum += temp;
+        city_stats.count += 1.0;
+    }
+    chunks.clear();
+    let mut cities = cities.lock().unwrap();
+    for (city, stat) in stats {
+        let city_stats = cities.entry(city).or_default();
+        city_stats.min = stat.min.min(city_stats.min);
+        city_stats.max = stat.max.max(city_stats.max);
+        city_stats.sum += stat.sum;
+        city_stats.count += stat.count;
+    }
 }
 
 pub fn read_by_single_thread_with_btree() -> Result<(), Error> {
@@ -182,7 +189,7 @@ pub fn read_by_single_thread_with_hashmap() -> Result<(), Error> {
             cities
                 .entry(city.to_string())
                 .and_modify(|f| f.push(temp))
-                .or_insert(Vec::new())
+                .or_default()
                 .push(temp);
             buf.clear()
         }
@@ -213,7 +220,7 @@ pub fn read_by_single_thread_with_fast_hasher() -> Result<(), Error> {
             cities
                 .entry(city.to_string())
                 .and_modify(|f| f.push(temp))
-                .or_insert(Vec::new())
+                .or_default()
                 .push(temp);
             buf.clear()
         }
@@ -250,7 +257,7 @@ pub async fn read_by_threads_shared_data() -> io::Result<()> {
             };
 
             let cities = Arc::clone(&cities);
-            let chunk_lines: Vec<String> = lines[start_line..end_line].iter().cloned().collect();
+            let chunk_lines: Vec<String> = lines[start_line..end_line].to_vec();
 
             tokio::spawn(async move {
                 for line in chunk_lines {
@@ -304,7 +311,7 @@ pub async fn read_by_threads_with_mpsc_channels() -> io::Result<()> {
                 (i + 1) * lines_per_thread
             };
 
-            let chunk_lines: Vec<String> = lines[start_line..end_line].iter().cloned().collect();
+            let chunk_lines: Vec<String> = lines[start_line..end_line].to_vec();
             let tx_clone = tx.clone();
 
             tokio::spawn(async move {
@@ -324,7 +331,7 @@ pub async fn read_by_threads_with_mpsc_channels() -> io::Result<()> {
         cities
             .entry(message.city)
             .and_modify(|f| f.push(message.temperature))
-            .or_insert(Vec::new())
+            .or_default()
             .push(message.temperature);
     }
 
@@ -350,7 +357,7 @@ pub async fn read_by_threads_with_broadcast_channels() -> io::Result<()> {
     let lines: Vec<_> = reader.lines().map(|line| line.unwrap()).collect();
     let total_lines = lines.len();
     let lines_per_thread = total_lines / num_threads;
-    let (tx, mut rx) = broadcast::channel::<Message>(lines_per_thread);
+    let (tx, _rx) = broadcast::channel::<Message>(lines_per_thread);
     let cities = Arc::new(Mutex::new(HashMap::<String, Vec<f32>>::new()));
 
     let senders: Vec<_> = (0..num_threads)
@@ -362,7 +369,7 @@ pub async fn read_by_threads_with_broadcast_channels() -> io::Result<()> {
                 (i + 1) * lines_per_thread
             };
 
-            let chunk_lines: Vec<String> = lines[start_line..end_line].iter().cloned().collect();
+            let chunk_lines: Vec<String> = lines[start_line..end_line].to_vec();
             let tx_clone = tx.clone();
 
             tokio::spawn(async move {
@@ -420,16 +427,16 @@ pub async fn read_by_threads_with_broadcast_channels() -> io::Result<()> {
 }
 
 pub fn extract_city_temp(buf: &str) -> (String, f32) {
-    let values: Vec<&str> = buf.trim_end().split(";").collect();
-    let city = values.get(0).unwrap();
+    let values: Vec<&str> = buf.trim_end().split(';').collect();
+    let city = values.first().unwrap();
     let temp = values.get(1).unwrap();
     let temp = temp.parse::<f32>().unwrap();
     (city.to_string(), temp)
 }
 
 pub fn extract_city_temp_with_parser(buf: &str) -> (String, f32) {
-    let values: Vec<&str> = buf.trim_end().split(";").collect();
-    let city = values.get(0).unwrap();
+    let values: Vec<&str> = buf.trim_end().split(';').collect();
+    let city = values.first().unwrap();
     let temp = values.get(1).unwrap();
     let temp = float_parser(temp).unwrap();
     (city.to_string(), temp)
@@ -440,8 +447,14 @@ fn float_parser(input: &str) -> Option<f32> {
     let mut fraction = 0.0;
     let mut decimal_place = 0;
     let mut is_fractional = false;
+    let mut is_negative = false;
 
-    for c in input.chars() {
+    let mut chars = input.chars();
+    if let Some('-') = chars.next() {
+        is_negative = true;
+    }
+
+    for c in chars {
         match c {
             '0'..='9' => {
                 let digit = (c as u8 - b'0') as f32;
@@ -459,8 +472,12 @@ fn float_parser(input: &str) -> Option<f32> {
         }
     }
 
+    if is_negative {
+        result *= -1.0;
+    }
+
     if is_fractional {
-        fraction /= 10.0_f32.powi(decimal_place as i32);
+        fraction /= 10.0_f32.powi(decimal_place);
         result += fraction;
     }
 
@@ -489,6 +506,9 @@ mod tests {
         let input = "11321.3";
         let res = float_parser(input);
         assert_eq!(11321.3, res.unwrap());
+        let input = "-11.3";
+        let res = float_parser(input);
+        assert_eq!(-11.3, res.unwrap());
     }
 
     #[test]

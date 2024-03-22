@@ -48,10 +48,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     // });
     // group_city_and_temp_parse.finish();
 
-
     c.bench_function("run()", |b| b.iter(|| run()));
-
-
 }
 criterion_group!(benches, criterion_benchmark);
 criterion_main!(benches);
