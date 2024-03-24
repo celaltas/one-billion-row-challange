@@ -9,6 +9,7 @@ edition = "2021"
 num_cpus = "1.16.0"
 tokio = { version = "1", features = ["full"] }
 rustc-hash = "1.1"
+threadpool = "1.8.1"
 
 [dev-dependencies]
 criterion = "0.5.1"
@@ -16,3 +17,6 @@ criterion = "0.5.1"
 [[bench]]
 name = "1brc"
 harness = false
+
+[profile.release]
+debug = true

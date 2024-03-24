@@ -39,16 +39,19 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 
     // group_comparing_run.finish();
 
-    // let mut group_city_and_temp_parse = c.benchmark_group("city_and_temp_parse");
-    // group_city_and_temp_parse.bench_function("extract_city_temp", |b| {
-    //     b.iter(|| extract_city_temp(black_box("Adana;32.1")))
-    // });
-    // group_city_and_temp_parse.bench_function("extract_city_temp_with_parser", |b| {
-    //     b.iter(|| extract_city_temp_with_parser(black_box("Adana;32.1")))
-    // });
-    // group_city_and_temp_parse.finish();
+    let mut group_city_and_temp_parse = c.benchmark_group("city_and_temp_parse");
 
-    c.bench_function("run()", |b| b.iter(|| run()));
+    group_city_and_temp_parse.bench_function("extract_city_temp_with_parser", |b| {
+        b.iter(|| extract_city_temp_with_parser(black_box("Adana;32.1")))
+    });
+
+    group_city_and_temp_parse.bench_function("extract_city_temp", |b| {
+        b.iter(|| extract_city_temp(black_box("Adana;32.1")))
+    });
+
+    group_city_and_temp_parse.finish();
+
+    // c.bench_function("run()", |b| b.iter(|| run()));
 }
 criterion_group!(benches, criterion_benchmark);
 criterion_main!(benches);

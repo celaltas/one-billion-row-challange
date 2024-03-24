@@ -4,7 +4,9 @@ use std::{
     fs::File,
     io::{self, BufRead, BufReader, Error},
     sync::{Arc, Mutex},
+    time::Instant,
 };
+use threadpool::ThreadPool;
 use tokio::sync::{broadcast, mpsc};
 
 pub struct Stats {
@@ -59,10 +61,11 @@ impl<'a> City<'a> {
 pub async fn run() -> io::Result<()> {
     let filename = "measurements.txt";
     let reader = BufReader::new(File::open(filename)?);
-    let chunk_size = 10000;
+    let chunk_size = 8000;
     let chunks = Arc::new(Mutex::new(Vec::with_capacity(chunk_size)));
     let cities = Arc::new(Mutex::new(BTreeMap::<String, Stats>::new()));
     let mut total = 0;
+    let pool = ThreadPool::new(24);
 
     for line in reader.lines() {
         let line = line.unwrap();
@@ -71,10 +74,13 @@ pub async fn run() -> io::Result<()> {
         if chunks.lock().unwrap().len() == chunk_size {
             let cities = Arc::clone(&cities);
             let chunks_clone = Arc::clone(&chunks);
-            let handle = tokio::spawn(async move {
-                process_chunk(chunks_clone, cities).await;
+            // let handle = tokio::spawn(async move {
+            //     process_chunk(chunks_clone, cities).await;
+            // });
+            // handle.await?;
+            pool.execute( || {
+                process_chunk(chunks_clone, cities)
             });
-            handle.await?;
             total += chunk_size;
             println!("total = {total}");
         }
@@ -89,14 +95,14 @@ pub async fn run() -> io::Result<()> {
     Ok(())
 }
 
-async fn process_chunk(
+fn process_chunk(
     chunks: Arc<Mutex<Vec<String>>>,
     cities: Arc<Mutex<BTreeMap<String, Stats>>>,
 ) {
     let mut stats = BTreeMap::<String, Stats>::new();
     let mut chunks = chunks.lock().unwrap();
     for line in chunks.iter() {
-        let (city, temp) = extract_city_temp(&line);
+        let (city, temp) = extract_city_temp_with_parser(&line);
         let city_stats = stats.entry(city).or_default();
         city_stats.min = temp.min(city_stats.min);
         city_stats.max = temp.max(city_stats.max);
@@ -114,12 +120,25 @@ async fn process_chunk(
     }
 }
 
+fn read_exact_line(filename: &str, start_line: usize, num_lines: usize) -> Vec<String> {
+    let reader = BufReader::new(File::open(filename).unwrap());
+
+    let lines = reader
+        .lines()
+        .skip(start_line)
+        .take(num_lines)
+        .map(|l| l.unwrap())
+        .collect();
+    lines
+}
+
 pub fn read_by_single_thread_with_btree() -> Result<(), Error> {
     let mut cities: BTreeMap<String, Stats> = BTreeMap::new();
     let filename = "measurements.txt";
     let file = File::open(filename)?;
     let mut file = BufReader::new(file);
     let mut buf = String::new();
+    let mut total = 0;
     loop {
         let byte_read = file.read_line(&mut buf).unwrap();
         if byte_read == 0 {
@@ -131,7 +150,9 @@ pub fn read_by_single_thread_with_btree() -> Result<(), Error> {
             city_stats.max = temp.max(city_stats.max);
             city_stats.sum += temp;
             city_stats.count += 1.0;
-            buf.clear()
+            buf.clear();
+            total += 1;
+            println!("{total}");
         }
     }
 
@@ -442,19 +463,14 @@ pub fn extract_city_temp_with_parser(buf: &str) -> (String, f32) {
     (city.to_string(), temp)
 }
 
-fn float_parser(input: &str) -> Option<f32> {
+pub fn float_parser(input: &str) -> Option<f32> {
     let mut result = 0.0;
     let mut fraction = 0.0;
     let mut decimal_place = 0;
     let mut is_fractional = false;
     let mut is_negative = false;
 
-    let mut chars = input.chars();
-    if let Some('-') = chars.next() {
-        is_negative = true;
-    }
-
-    for c in chars {
+    for c in input.chars() {
         match c {
             '0'..='9' => {
                 let digit = (c as u8 - b'0') as f32;
@@ -468,17 +484,19 @@ fn float_parser(input: &str) -> Option<f32> {
             '.' => {
                 is_fractional = true;
             }
+            '-' => {
+                is_negative = true;
+            }
             _ => return None,
         }
     }
 
+    if is_fractional {
+        fraction /= 10.0_f32.powi(decimal_place as i32);
+        result += fraction;
+    }
     if is_negative {
         result *= -1.0;
-    }
-
-    if is_fractional {
-        fraction /= 10.0_f32.powi(decimal_place);
-        result += fraction;
     }
 
     Some(result)
